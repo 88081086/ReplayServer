@@ -112,13 +112,28 @@ public class Replay extends HttpServlet {
                 });
             }
 
-            out.println("<table width='100%'>");
+            out.println("<table width='100%' cellpadding='5'>");
+            int i=0; 
             for (File file: files) {
+                String color = "#eeeeee";
+                if (i%2 != 0) color = "#ffffff";
+                i++;
+
                 String name = file.getName();
                 if (file.isDirectory()) {
-                    out.println(String.format("<tr><td><a href='index.html?entry=%s'><b>%s</b></a></td></tr>", URLEncoder.encode(String.format("%s/%s", entry, name), "UTF-8"), name));
+                    out.println(String.format("<tr bgcolor='%s'><td><a href='index.html?entry=%s'><b>%s</b></a><br>&nbsp;</td></tr>", color, URLEncoder.encode(String.format("%s/%s", entry, name), "UTF-8"), name));
                 } else {
-                    out.println(String.format("<tr><td><a href='index.html?entry=%s'>%s</a></td></tr>", URLEncoder.encode(String.format("%s/%s", entry, name), "UTF-8"), name));
+                    String comment = "&nbsp;";
+                    Loader loader = Loader.loadReplay(file);
+                    if (loader != null && loader.mComment != null) {
+                        int length = loader.mComment.length();
+                        if (length > 50) {
+                            comment = loader.mComment.substring(0, 50)+"...";
+                        } else if (length > 0) {
+                            comment = loader.mComment;
+                        }
+                    }
+                    out.println(String.format("<tr bgcolor='%s'><td><a href='index.html?entry=%s'>%s</a><br/><small>%s</small></td></tr>", color, URLEncoder.encode(String.format("%s/%s", entry, name), "UTF-8"), name, comment));
                 }
             }
             out.println("</table>");
